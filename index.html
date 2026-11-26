@@ -3,85 +3,935 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Memory Garden 🌷</title>
-  <meta name="theme-color" content="#f7e9e5" />
-  <link rel="stylesheet" href="style.css" />
+  <title>The Memory Garden — A Digital Keepsake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-cream: #fbf7f0;
+      --paper: #fffdf9;
+      --ink: #3a2e2c;
+      --muted: #7a6864;
+      --accent-rose: #b85d6f;
+      --accent-gold: #c59b5f;
+      --accent-sage: #6c8270;
+      --border-soft: #e6dacb;
+      --shadow-soft: 0 14px 35px rgba(58, 46, 44, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-cream);
+      background-image: radial-gradient(#e7dccb 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* FLOATING MUSIC PLAYER */
+    .music-player {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(255, 253, 249, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-soft);
+      width: 280px;
+      transition: all 0.3s ease;
+    }
+
+    .music-player.minimized {
+      width: 190px;
+    }
+
+    .music-player.minimized .music-info {
+      display: none;
+    }
+
+    .music-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .music-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--accent-rose);
+      font-weight: 600;
+    }
+
+    .minimize-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .music-body {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .album-cover {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border-soft);
+      animation: spinSlow 14s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .music-player.playing .album-cover {
+      animation-play-state: running;
+    }
+
+    @keyframes spinSlow {
+      100% { transform: rotate(360deg); }
+    }
+
+    .music-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .song-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-artist {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+    }
+
+    .volume-control input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-rose);
+      height: 4px;
+      cursor: pointer;
+    }
+
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent-rose);
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.08);
+    }
+
+    /* CHAPTER PROGRESS DOTS */
+    .chapter-dots {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 40;
+      background: rgba(255, 253, 249, 0.85);
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #dfd3c3;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: var(--accent-rose);
+      transform: scale(1.3);
+    }
+
+    /* MAIN CONTAINER & CHAPTER TRANSITIONS */
+    .book-container {
+      width: 100%;
+      max-width: 780px;
+      margin: 50px auto 90px;
+    }
+
+    .chapter {
+      display: none;
+      background: var(--paper);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 42px 32px;
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      animation: fadeUp 0.65s ease forwards;
+    }
+
+    .chapter.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chapter-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .chapter-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.3rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .chapter-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 520px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    /* CHAPTER 01: INVITATION */
+    .envelope-wrapper {
+      background: linear-gradient(145deg, #fdf8f0, #f5eadb);
+      border: 1.5px dashed var(--accent-gold);
+      border-radius: 20px;
+      padding: 40px 24px;
+      position: relative;
+      margin-top: 12px;
+    }
+
+    .wax-seal {
+      width: 56px;
+      height: 56px;
+      background: var(--accent-rose);
+      color: #fff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      margin: 0 auto 18px;
+      box-shadow: 0 6px 16px rgba(184, 93, 111, 0.35);
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--muted);
+    }
+
+    .recipient-name {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      margin: 10px 0 14px;
+      color: var(--ink);
+    }
+
+    .hint-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* BUTTONS */
+    .btn-primary, .btn-secondary, .btn-envelope {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 12px 24px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent-rose);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(184, 93, 111, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background: #a44d5f;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--muted);
+    }
+
+    .btn-secondary:hover {
+      background: #f5ede2;
+      color: var(--ink);
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    /* CHAPTER 02: MEMORY GARDEN */
+    .garden-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .flower-card {
+      background: #fdf9f3;
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 18px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+    }
+
+    .flower-card:hover, .flower-card.opened {
+      transform: translateY(-4px);
+      border-color: var(--accent-sage);
+      background: #f3f7f2;
+    }
+
+    .flower-icon {
+      font-size: 2.2rem;
+    }
+
+    .flower-label {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+
+    .flower-status {
+      font-size: 0.72rem;
+      color: var(--accent-sage);
+    }
+
+    .flower-message-box {
+      background: #f7f1e7;
+      border-left: 4px solid var(--accent-sage);
+      padding: 18px 20px;
+      border-radius: 12px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--ink);
+      min-height: 76px;
+      display: grid;
+      place-items: center;
+    }
+
+    /* CHAPTER 03: SCRAPBOOK POLAROIDS */
+    .scrapbook-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 22px;
+      margin-top: 10px;
+    }
+
+    .polaroid {
+      background: #fff;
+      padding: 12px 12px 20px;
+      border: 1px solid #eadfd2;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+      transform: rotate(var(--rot, 0deg));
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.04);
+      z-index: 5;
+    }
+
+    .tape {
+      width: 70px;
+      height: 20px;
+      background: rgba(226, 206, 177, 0.55);
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 185px;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+
+    .polaroid .caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    /* CHAPTER 04: LETTER */
+    .btn-envelope {
+      background: #f3e6d5;
+      color: var(--ink);
+      border: 1px solid var(--accent-gold);
+      margin-bottom: 20px;
+    }
+
+    .letter-paper {
+      display: none;
+      text-align: left;
+      background: #fffcf7;
+      border: 1px solid #e6d8c5;
+      padding: 32px;
+      border-radius: 12px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.22rem;
+      line-height: 1.75;
+      box-shadow: inset 0 0 30px rgba(235, 222, 202, 0.35);
+      animation: unfold 0.8s ease forwards;
+    }
+
+    .letter-paper.open {
+      display: block;
+    }
+
+    @keyframes unfold {
+      from { opacity: 0; transform: scaleY(0.85); }
+      to { opacity: 1; transform: scaleY(1); }
+    }
+
+    .letter-paper p {
+      margin-bottom: 14px;
+    }
+
+    .letter-date {
+      text-align: right;
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .letter-sign {
+      margin-top: 20px;
+    }
+
+    /* CHAPTER 05: BIRTHDAY CAKE & WISH */
+    .cake-stage {
+      margin: 24px 0;
+    }
+
+    .cake {
+      position: relative;
+      width: 160px;
+      height: 130px;
+      margin: 30px auto 24px;
+    }
+
+    .candle {
+      width: 12px;
+      height: 36px;
+      background: repeating-linear-gradient(45deg, #fff, #fff 5px, var(--accent-rose) 5px, var(--accent-rose) 10px);
+      margin: 0 auto;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .flame {
+      width: 14px;
+      height: 20px;
+      background: radial-gradient(circle, #fff6a9 10%, #ff9d00 60%, #ff4d00 100%);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      position: absolute;
+      top: -22px;
+      left: -1px;
+      animation: flicker 0.6s infinite alternate;
+      box-shadow: 0 0 14px #ffae00;
+    }
+
+    .flame.out {
+      display: none;
+    }
+
+    @keyframes flicker {
+      from { transform: scale(1) rotate(-2deg); }
+      to { transform: scale(1.1) rotate(2deg); }
+    }
+
+    .frosting {
+      width: 140px;
+      height: 22px;
+      background: #fff;
+      border-radius: 12px 12px 6px 6px;
+      margin: 0 auto;
+      border: 1px solid #eadfd2;
+    }
+
+    .cake-body {
+      width: 140px;
+      height: 58px;
+      background: #e5989b;
+      margin: 0 auto;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .plate {
+      width: 170px;
+      height: 10px;
+      background: #dfd3c3;
+      border-radius: 999px;
+      margin: 0 auto;
+    }
+
+    .final-gift-card {
+      display: none;
+      background: #fdf6ec;
+      border: 1.5px solid var(--accent-gold);
+      border-radius: 18px;
+      padding: 24px;
+      margin-top: 24px;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .final-gift-card.show {
+      display: block;
+    }
+
+    .final-gift-card h3 {
+      font-family: 'Cinzel', serif;
+      margin-bottom: 10px;
+      color: var(--accent-rose);
+    }
+
+    .final-gift-card p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .chapter { padding: 32px 18px; }
+      .recipient-name { font-size: 1.9rem; }
+      .music-player { width: calc(100% - 32px); right: 16px; bottom: 14px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="grain"></div>
-  <audio id="bgMusic" src="music.mp3" loop preload="none"></audio>
-  <button class="music-pill" id="musicToggle" aria-label="Putar atau jeda musik">
-    <span class="music-icon">♫</span><span id="musicLabel">Play our song</span><span class="music-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-  </button>
 
-  <main class="book" aria-live="polite">
-    <section class="chapter active" id="chapter-1">
-      <div class="eyebrow">A LITTLE SOMETHING FOR YOU</div>
-      <div class="envelope-wrap" id="envelope">
-        <div class="envelope"><div class="letter-peek">for you,<br/>with love ♡</div><div class="flap"></div><div class="seal">♡</div></div>
+  <!-- Canvas untuk efek confetti -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- ========================================================= -->
+  <!-- EDIT DI SINI: MUSIC PLAYER (COVER, JUDUL, ARTIS, FILE MP3) -->
+  <!-- ========================================================= -->
+  <div class="music-player" id="musicPlayer">
+    <div class="music-header">
+      <span class="music-badge">Our little soundtrack</span>
+      <button id="togglePlayerSize" class="minimize-btn" title="Perkecil/Perbesar">−</button>
+    </div>
+    <div class="music-body">
+      <!-- Ganti src dengan nama file cover lagu kamu (misal: cover.jpg) -->
+      <img src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=150&q=80" alt="Album Cover" class="album-cover" />
+      <div class="music-info">
+        <div class="song-title">Until I Found You</div>
+        <div class="song-artist">Stephen Sanchez</div>
+        <div class="volume-control">
+          <span>🔈</span>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7" />
+        </div>
       </div>
-      <p class="small-note">Psst… there's a tiny world waiting inside.</p>
-      <h1>Welcome to<br/><em>your memory garden.</em></h1>
-      <p class="intro">A little collection of flowers, memories, and wishes—made just for you.</p>
-      <button class="next-btn" data-next="2">Open my gift <span>↗</span></button>
+      <button id="playPauseBtn" class="play-btn" aria-label="Play or Pause">▶</button>
+    </div>
+    <!-- Upload file MP3 kamu ke GitHub dengan nama audio.mp3 -->
+    <audio id="bgMusic" loop preload="auto">
+      <source src="audio.mp3" type="audio/mpeg" />
+    </audio>
+  </div>
+
+  <!-- Indikator Progress Chapter -->
+  <nav class="chapter-dots" aria-label="Chapter Progress">
+    <span class="dot active" data-step="0"></span>
+    <span class="dot" data-step="1"></span>
+    <span class="dot" data-step="2"></span>
+    <span class="dot" data-step="3"></span>
+    <span class="dot" data-step="4"></span>
+  </nav>
+
+  <main class="book-container">
+
+    <!-- ========================================================= -->
+    <!-- CHAPTER 01: THE INVITATION (EDIT NAMA PENERIMA DI SINI)   -->
+    <!-- ========================================================= -->
+    <section class="chapter active" id="chapter-0">
+      <div class="chapter-tag">01 — The Invitation</div>
+      <div class="envelope-wrapper">
+        <div class="wax-seal">🌷</div>
+        <p class="subtitle">A small digital keepsake crafted specially for</p>
+        <h1 class="recipient-name">Someone Special</h1>
+        <p class="hint-text">Tap the button below to open your gift & start the music</p>
+        <button class="btn-primary" id="openGiftBtn">Open my gift ✨</button>
+      </div>
     </section>
 
+    <!-- ========================================================= -->
+    <!-- CHAPTER 02: THE MEMORY GARDEN (EDIT PESAN TIAP BUNGA)     -->
+    <!-- ========================================================= -->
+    <section class="chapter" id="chapter-1">
+      <div class="chapter-tag">02 — The Memory Garden</div>
+      <h2 class="chapter-title">Blooms of Our Moments</h2>
+      <p class="chapter-desc">Ketuk setiap bunga di taman ini untuk membuka pesan rahasia di baliknya.</p>
+
+      <div class="garden-grid">
+        <button class="flower-card" data-msg="Terima kasih sudah selalu menjadi tempat pulang yang paling tenang di hari-hari yang ramai.">
+          <span class="flower-icon">🌷</span>
+          <span class="flower-label">Tulip Merah Muda</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Setiap tawa kecil dan obrolan random kita selalu jadi bagian favoritku.">
+          <span class="flower-icon">🌻</span>
+          <span class="flower-label">Bunga Matahari</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Semoga langkahmu ke depan selalu dikelilingi hal-hal baik dan orang-orang yang tulus.">
+          <span class="flower-icon">🪻</span>
+          <span class="flower-label">Lavender</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Jangan pernah lupa betapa berharganya dirimu bagi orang-orang di sekitarmu.">
+          <span class="flower-icon">🌹</span>
+          <span class="flower-label">Mawar Klasik</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+      </div>
+
+      <div class="flower-message-box">
+        <p id="flowerMessageText">Pilih salah satu bunga di atas untuk membaca pesannya...</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Lanjut ke Scrapbook →</button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- CHAPTER 03: LITTLE MEMORIES (EDIT FOTO & CAPTION POLAROID)-->
+    <!-- ========================================================= -->
     <section class="chapter" id="chapter-2">
-      <div class="eyebrow">CHAPTER 01 · THE GARDEN</div>
-      <h2>Some flowers bloom<br/><em>because of you.</em></h2>
-      <p class="intro">Tap a flower. Each one is holding a little message.</p>
-      <div class="garden" aria-label="Interactive flowers">
-        <button class="flower f1" data-message="You make ordinary days feel a little brighter. 🌼" aria-label="Flower one">🌼</button>
-        <button class="flower f2" data-message="I hope life gives you the same gentleness you give to others. 🌷" aria-label="Flower two">🌷</button>
-        <button class="flower f3" data-message="May you always find little reasons to smile, even on the quiet days. 🌸" aria-label="Flower three">🌸</button>
-        <button class="flower f4" data-message="You deserve beautiful things—not just today, but on all the days after. 🌻" aria-label="Flower four">🌻</button>
-        <span class="butterfly b1">🦋</span><span class="butterfly b2">🦋</span>
+      <div class="chapter-tag">03 — Little Memories</div>
+      <h2 class="chapter-title">Polaroids & Scrapbook</h2>
+      <p class="chapter-desc">Potongan kecil cerita yang sayang jika dilewatkan begitu saja.</p>
+
+      <div class="scrapbook-grid">
+        <div class="polaroid" style="--rot: -3deg;">
+          <div class="tape"></div>
+          <!-- Ganti src dengan nama file foto kamu (misal: foto1.jpg) -->
+          <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=500&q=80" alt="Memory 1" />
+          <p class="caption">Awal cerita yang sederhana, tapi selalu membekas.</p>
+        </div>
+        <div class="polaroid" style="--rot: 2.5deg;">
+          <div class="tape"></div>
+          <!-- Ganti src dengan nama file foto kamu (misal: foto2.jpg) -->
+          <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=500&q=80" alt="Memory 2" />
+          <p class="caption">Waktu terasa berjalan lebih cepat setiap kali bercerita.</p>
+        </div>
+        <div class="polaroid" style="--rot: -2deg;">
+          <div class="tape"></div>
+          <!-- Ganti src dengan nama file foto kamu (misal: foto3.jpg) -->
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80" alt="Memory 3" />
+          <p class="caption">Semoga lebih banyak lagi momen indah yang bisa dirayakan.</p>
+        </div>
       </div>
-      <div class="message-bubble" id="flowerMessage">Choose a flower to uncover its note ✨</div>
-      <button class="next-btn" data-next="3">Wander a little further <span>↗</span></button>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Buka Surat →</button>
+      </div>
     </section>
 
+    <!-- ========================================================= -->
+    <!-- CHAPTER 04: A LETTER FOR YOU (EDIT TANGGAL & ISI SURAT)   -->
+    <!-- ========================================================= -->
     <section class="chapter" id="chapter-3">
-      <div class="eyebrow">CHAPTER 02 · LITTLE MEMORIES</div>
-      <h2>Little things,<br/><em>kept forever.</em></h2>
-      <p class="intro">Replace these cards with your favorite photos and their stories.</p>
-      <div class="scrapbook">
-        <button class="polaroid p1" data-caption="A moment I wish I could bottle up and keep forever."><span class="photo-placeholder">✿</span><span class="polaroid-caption">the little joys</span></button>
-        <button class="polaroid p2" data-caption="Some memories don't need a special occasion to be special."><span class="photo-placeholder">☁</span><span class="polaroid-caption">somewhere, sometime</span></button>
-        <button class="polaroid p3" data-caption="Here's to all the moments we haven't made yet."><span class="photo-placeholder">♡</span><span class="polaroid-caption">to be continued…</span></button>
+      <div class="chapter-tag">04 — A Letter for You</div>
+      <h2 class="chapter-title">Words Left Unsaid</h2>
+
+      <div>
+        <button class="btn-envelope" id="unfoldLetterBtn">✉️ Buka Amplop Surat</button>
+
+        <article class="letter-paper" id="letterPaper">
+          <p class="letter-date">27 November</p>
+          <p>Selamat ulang tahun,</p>
+          <p>
+            Di hari yang spesial ini, aku cuma mau bilang terima kasih karena sudah bertahan, tumbuh, dan terus melangkah sejauh ini.
+            Tidak semua hari berjalan mudah, tapi kamu selalu punya cara untuk tetap hangat dan kuat.
+          </p>
+          <p>
+            Semoga di usia yang baru ini, segala hal yang sedang kamu usahakan perlahan menemukan jalannya.
+            Semoga kamu selalu diberi kesehatan, ketenangan hati, dan kebahagiaan yang melimpah.
+          </p>
+          <p class="letter-sign">Dengan hangat,<br><strong>Seseorang yang selalu mendoakanmu</strong></p>
+        </article>
       </div>
-      <div class="message-bubble" id="memoryMessage">Tap a photo for its little story ✨</div>
-      <button class="next-btn" data-next="4">One more page <span>↗</span></button>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Lihat Kejutan Terakhir →</button>
+      </div>
     </section>
 
+    <!-- ========================================================= -->
+    <!-- CHAPTER 05: YOUR BIRTHDAY WISH (EDIT HADIAH TERAKHIR)     -->
+    <!-- ========================================================= -->
     <section class="chapter" id="chapter-4">
-      <div class="eyebrow">CHAPTER 03 · A LETTER</div>
-      <h2>Words I tucked<br/><em>inside an envelope.</em></h2>
-      <p class="intro">Whenever you're ready, open it.</p>
-      <button class="letter-card" id="letterOpen" aria-label="Open birthday letter"><span class="letter-stamp">♡</span><span class="letter-to">A letter for you</span><span class="letter-hint">tap to open</span></button>
-      <article class="letter-content" id="letterContent">
-        <p>Happy birthday, you lovely human. ♡</p>
-        <p>I hope this new chapter brings you soft mornings, brave beginnings, unexpected laughter, and people who make you feel at home.</p>
-        <p>May you be proud of how far you've come, patient with the days that feel slow, and excited for all the beautiful things still finding their way to you.</p>
-        <p>Keep being wonderfully, unmistakably you. The world is a little brighter with you in it.</p>
-        <p class="signature">With love, always ✿</p>
-      </article>
-      <button class="next-btn" data-next="5">Save the last surprise <span>↗</span></button>
+      <div class="chapter-tag">05 — Your Birthday Wish</div>
+      <h2 class="chapter-title">Make a Wish!</h2>
+      <p class="chapter-desc">Pejamkan mata sejenak, ucapkan harapan terbaikmu, lalu tiup lilinnya.</p>
+
+      <div class="cake-stage">
+        <div class="cake">
+          <div class="candle">
+            <div class="flame" id="flame"></div>
+          </div>
+          <div class="frosting"></div>
+          <div class="cake-body"></div>
+          <div class="plate"></div>
+        </div>
+        <button class="btn-primary" id="blowCandleBtn">🌬️ Tiup Lilin & Rayakan</button>
+      </div>
+
+      <div class="final-gift-card" id="finalGiftCard">
+        <h3>🎁 Hadiah Terakhir Untukmu</h3>
+        <p>
+          Selamat ulang tahun sekali lagi! Semoga taman kenangan kecil ini bisa bikin kamu tersenyum hari ini.
+        </p>
+        <button class="btn-secondary" id="restartBtn">↺ Ulangi dari Awal</button>
+      </div>
     </section>
 
-    <section class="chapter" id="chapter-5">
-      <div class="eyebrow">CHAPTER 04 · YOUR DAY</div>
-      <div class="cake">🎂</div>
-      <h2>Make a wish,<br/><em>birthday star.</em></h2>
-      <p class="intro">May this year be kinder, brighter, and full of little magic.</p>
-      <button class="wish-btn" id="wishButton">I made a wish ✨</button>
-      <div class="final-message" id="finalMessage">Happy birthday! Here's to a whole garden of good things waiting for you. 🌷</div>
-      <div class="confetti" id="confetti"></div>
-      <button class="restart-btn" id="restart">↺ Visit the garden again</button>
-    </section>
-
-    <footer class="page-footer"><span id="chapterCount">01 / 05</span><span class="progress-dots"><i class="on"></i><i></i><i></i><i></i><i></i></span><span>made with ♡</span></footer>
   </main>
-  <script src="script.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const chapters = document.querySelectorAll(".chapter");
+      const dots = document.querySelectorAll(".dot");
+      let currentChapter = 0;
+
+      const bgMusic = document.getElementById("bgMusic");
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const musicPlayer = document.getElementById("musicPlayer");
+      const togglePlayerSize = document.getElementById("togglePlayerSize");
+
+      bgMusic.volume = volumeSlider.value;
+
+      function goToChapter(index) {
+        if (index < 0 || index >= chapters.length) return;
+        chapters[currentChapter].classList.remove("active");
+        dots[currentChapter].classList.remove("active");
+
+        currentChapter = index;
+        chapters[currentChapter].classList.add("active");
+        dots[currentChapter].classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function playMusic() {
+        bgMusic.play().then(() => {
+          playPauseBtn.textContent = "⏸";
+          musicPlayer.classList.add("playing");
+        }).catch(() => {
+          playPauseBtn.textContent = "▶";
+        });
+      }
+
+      function pauseMusic() {
+        bgMusic.pause();
+        playPauseBtn.textContent = "▶";
+        musicPlayer.classList.remove("playing");
+      }
+
+      playPauseBtn.addEventListener("click", () => {
+        if (bgMusic.paused) {
+          playMusic();
+        } else {
+          pauseMusic();
+        }
+      });
+
+      volumeSlider.addEventListener("input", (e) => {
+        bgMusic.volume = e.target.value;
+      });
+
+      togglePlayerSize.addEventListener("click", () => {
+        musicPlayer.classList.toggle("minimized");
+        togglePlayerSize.textContent = musicPlayer.classList.contains("minimized") ? "+" : "−";
+      });
+
+      document.getElementById("openGiftBtn").addEventListener("click", () => {
+        playMusic();
+        goToChapter(1);
+      });
+
+      document.querySelectorAll(".next-btn").forEach((btn) => {
+        btn.addEventListener("click", () => goToChapter(currentChapter + 1));
+      });
+
+      document.querySelectorAll(".prev-btn").forEach((btn) => {
+        btn.addEventListener("click", () => goToChapter(currentChapter - 1));
+      });
+
+      const flowerCards = document.querySelectorAll(".flower-card");
+      const flowerMessageText = document.getElementById("flowerMessageText");
+
+      flowerCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          flowerCards.forEach((c) => c.classList.remove("opened"));
+          card.classList.add("opened");
+          card.querySelector(".flower-status").textContent = "Terbuka ✨";
+          flowerMessageText.textContent = `"${card.dataset.msg}"`;
+        });
+      });
+
+      const unfoldLetterBtn = document.getElementById("unfoldLetterBtn");
+      const letterPaper = document.getElementById("letterPaper");
+
+      unfoldLetterBtn.addEventListener("click", () => {
+        letterPaper.classList.add("open");
+        unfoldLetterBtn.style.display = "none";
+      });
+
+      const blowCandleBtn = document.getElementById("blowCandleBtn");
+      const flame = document.getElementById("flame");
+      const finalGiftCard = document.getElementById("finalGiftCard");
+
+      blowCandleBtn.addEventListener("click", () => {
+        flame.classList.add("out");
+        blowCandleBtn.textContent = "🎉 Happy Birthday!";
+        blowCandleBtn.disabled = true;
+        finalGiftCard.classList.add("show");
+        launchConfetti();
+      });
+
+      document.getElementById("restartBtn").addEventListener("click", () => {
+        flame.classList.remove("out");
+        blowCandleBtn.textContent = "🌬️ Tiup Lilin & Rayakan";
+        blowCandleBtn.disabled = false;
+        finalGiftCard.classList.remove("show");
+        letterPaper.classList.remove("open");
+        unfoldLetterBtn.style.display = "inline-block";
+        goToChapter(0);
+      });
+
+      function launchConfetti() {
+        const canvas = document.getElementById("fx-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ["#b85d6f", "#c59b5f", "#6c8270", "#f2b5d4", "#f7d6e0"];
+        const pieces = Array.from({ length: 90 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 3 + 2,
+          speedX: (Math.random() - 0.5) * 2,
+          angle: Math.random() * 360
+        }));
+
+        let frame = 0;
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          pieces.forEach((p) => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.angle += 4;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.angle * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            ctx.restore();
+          });
+          frame++;
+          if (frame < 220) {
+            requestAnimationFrame(animate);
+          } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+        animate();
+      }
+    });
+  </script>
 </body>
 </html>
