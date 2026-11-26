@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Memory Garden 🌷</title>
+  <meta name="theme-color" content="#f7e9e5" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <audio id="bgMusic" src="music.mp3" loop preload="none"></audio>
+  <button class="music-pill" id="musicToggle" aria-label="Putar atau jeda musik">
+    <span class="music-icon">♫</span><span id="musicLabel">Play our song</span><span class="music-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+  </button>
+
+  <main class="book" aria-live="polite">
+    <section class="chapter active" id="chapter-1">
+      <div class="eyebrow">A LITTLE SOMETHING FOR YOU</div>
+      <div class="envelope-wrap" id="envelope">
+        <div class="envelope"><div class="letter-peek">for you,<br/>with love ♡</div><div class="flap"></div><div class="seal">♡</div></div>
+      </div>
+      <p class="small-note">Psst… there's a tiny world waiting inside.</p>
+      <h1>Welcome to<br/><em>your memory garden.</em></h1>
+      <p class="intro">A little collection of flowers, memories, and wishes—made just for you.</p>
+      <button class="next-btn" data-next="2">Open my gift <span>↗</span></button>
+    </section>
+
+    <section class="chapter" id="chapter-2">
+      <div class="eyebrow">CHAPTER 01 · THE GARDEN</div>
+      <h2>Some flowers bloom<br/><em>because of you.</em></h2>
+      <p class="intro">Tap a flower. Each one is holding a little message.</p>
+      <div class="garden" aria-label="Interactive flowers">
+        <button class="flower f1" data-message="You make ordinary days feel a little brighter. 🌼" aria-label="Flower one">🌼</button>
+        <button class="flower f2" data-message="I hope life gives you the same gentleness you give to others. 🌷" aria-label="Flower two">🌷</button>
+        <button class="flower f3" data-message="May you always find little reasons to smile, even on the quiet days. 🌸" aria-label="Flower three">🌸</button>
+        <button class="flower f4" data-message="You deserve beautiful things—not just today, but on all the days after. 🌻" aria-label="Flower four">🌻</button>
+        <span class="butterfly b1">🦋</span><span class="butterfly b2">🦋</span>
+      </div>
+      <div class="message-bubble" id="flowerMessage">Choose a flower to uncover its note ✨</div>
+      <button class="next-btn" data-next="3">Wander a little further <span>↗</span></button>
+    </section>
+
+    <section class="chapter" id="chapter-3">
+      <div class="eyebrow">CHAPTER 02 · LITTLE MEMORIES</div>
+      <h2>Little things,<br/><em>kept forever.</em></h2>
+      <p class="intro">Replace these cards with your favorite photos and their stories.</p>
+      <div class="scrapbook">
+        <button class="polaroid p1" data-caption="A moment I wish I could bottle up and keep forever."><span class="photo-placeholder">✿</span><span class="polaroid-caption">the little joys</span></button>
+        <button class="polaroid p2" data-caption="Some memories don't need a special occasion to be special."><span class="photo-placeholder">☁</span><span class="polaroid-caption">somewhere, sometime</span></button>
+        <button class="polaroid p3" data-caption="Here's to all the moments we haven't made yet."><span class="photo-placeholder">♡</span><span class="polaroid-caption">to be continued…</span></button>
+      </div>
+      <div class="message-bubble" id="memoryMessage">Tap a photo for its little story ✨</div>
+      <button class="next-btn" data-next="4">One more page <span>↗</span></button>
+    </section>
+
+    <section class="chapter" id="chapter-4">
+      <div class="eyebrow">CHAPTER 03 · A LETTER</div>
+      <h2>Words I tucked<br/><em>inside an envelope.</em></h2>
+      <p class="intro">Whenever you're ready, open it.</p>
+      <button class="letter-card" id="letterOpen" aria-label="Open birthday letter"><span class="letter-stamp">♡</span><span class="letter-to">A letter for you</span><span class="letter-hint">tap to open</span></button>
+      <article class="letter-content" id="letterContent">
+        <p>Happy birthday, you lovely human. ♡</p>
+        <p>I hope this new chapter brings you soft mornings, brave beginnings, unexpected laughter, and people who make you feel at home.</p>
+        <p>May you be proud of how far you've come, patient with the days that feel slow, and excited for all the beautiful things still finding their way to you.</p>
+        <p>Keep being wonderfully, unmistakably you. The world is a little brighter with you in it.</p>
+        <p class="signature">With love, always ✿</p>
+      </article>
+      <button class="next-btn" data-next="5">Save the last surprise <span>↗</span></button>
+    </section>
+
+    <section class="chapter" id="chapter-5">
+      <div class="eyebrow">CHAPTER 04 · YOUR DAY</div>
+      <div class="cake">🎂</div>
+      <h2>Make a wish,<br/><em>birthday star.</em></h2>
+      <p class="intro">May this year be kinder, brighter, and full of little magic.</p>
+      <button class="wish-btn" id="wishButton">I made a wish ✨</button>
+      <div class="final-message" id="finalMessage">Happy birthday! Here's to a whole garden of good things waiting for you. 🌷</div>
+      <div class="confetti" id="confetti"></div>
+      <button class="restart-btn" id="restart">↺ Visit the garden again</button>
+    </section>
+
+    <footer class="page-footer"><span id="chapterCount">01 / 05</span><span class="progress-dots"><i class="on"></i><i></i><i></i><i></i><i></i></span><span>made with ♡</span></footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
