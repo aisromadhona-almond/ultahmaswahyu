@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>The Memory Garden — A Digital Keepsake</title>
+  <title>The Memory Garden — For Ka Wahyu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 16px 16px 135px; /* Ruang ekstra di bawah agar tidak tertutup music player di HP */
+      padding: 16px 16px 135px;
     }
 
     #fx-canvas {
@@ -376,6 +376,7 @@
 
     .flower-icon {
       font-size: 2rem;
+      line-height: 1.2;
     }
 
     .flower-label {
@@ -403,7 +404,7 @@
       place-items: center;
     }
 
-    /* CHAPTER 03: SCRAPBOOK POLAROIDS (5 FOTO) */
+    /* CHAPTER 03: SCRAPBOOK POLAROIDS (7 FOTO) */
     .scrapbook-grid {
       display: flex;
       flex-wrap: wrap;
@@ -414,7 +415,7 @@
 
     .polaroid {
       background: #fff;
-      width: 210px;
+      width: 215px;
       padding: 12px 12px 18px;
       border: 1px solid #eadfd2;
       box-shadow: 0 10px 24px rgba(0,0,0,0.07);
@@ -440,7 +441,7 @@
 
     .polaroid img {
       width: 100%;
-      height: 185px;
+      height: 190px;
       object-fit: cover;
       margin-bottom: 10px;
       border-radius: 2px;
@@ -448,9 +449,9 @@
 
     .polaroid .caption {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       color: var(--ink);
-      line-height: 1.35;
+      line-height: 1.4;
     }
 
     /* CHAPTER 04: LETTER */
@@ -486,12 +487,6 @@
 
     .letter-paper p {
       margin-bottom: 14px;
-    }
-
-    .letter-date {
-      text-align: right;
-      font-style: italic;
-      color: var(--muted);
     }
 
     .letter-sign {
@@ -591,4 +586,386 @@
       margin-bottom: 18px;
     }
 
-    /* KHUSUS LAYAR HP
+    /* KHUSUS LAYAR HP */
+    @media (max-width: 600px) {
+      .chapter { padding: 28px 18px; }
+      .recipient-name { font-size: 1.85rem; }
+      .polaroid { width: 100%; max-width: 280px; }
+      .polaroid img { height: 220px; }
+      .music-player {
+        width: calc(100% - 28px);
+        right: 14px;
+        bottom: 12px;
+      }
+      .music-player.minimized {
+        width: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas untuk efek confetti -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- MUSIC PLAYER -->
+  <div class="music-player" id="musicPlayer">
+    <div class="music-header">
+      <span class="music-badge">Our little soundtrack</span>
+      <button id="togglePlayerSize" class="minimize-btn" title="Perkecil/Perbesar">−</button>
+    </div>
+    <div class="music-body">
+      <img src="cover.jpg" alt="Album Cover" class="album-cover" />
+      <div class="music-info">
+        <div class="song-title">Besok Kita Pergi Makan</div>
+        <div class="song-artist">Sal Priadi</div>
+        <div class="volume-control">
+          <span>🔈</span>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.7" />
+        </div>
+      </div>
+      <button id="playPauseBtn" class="play-btn" aria-label="Play or Pause">▶</button>
+    </div>
+    <audio id="bgMusic" src="audio.mp3" loop preload="auto"></audio>
+  </div>
+
+  <!-- Indikator Progress Chapter -->
+  <nav class="chapter-dots" aria-label="Chapter Progress">
+    <span class="dot active" data-step="0"></span>
+    <span class="dot" data-step="1"></span>
+    <span class="dot" data-step="2"></span>
+    <span class="dot" data-step="3"></span>
+    <span class="dot" data-step="4"></span>
+  </nav>
+
+  <main class="book-container">
+
+    <!-- CHAPTER 01: THE INVITATION -->
+    <section class="chapter active" id="chapter-0">
+      <div class="chapter-tag">01 — The Invitation</div>
+      <div class="envelope-wrapper">
+        <div class="wax-seal">🌷</div>
+        <p class="subtitle">A small digital keepsake crafted specially for</p>
+        <h1 class="recipient-name">Ka Wahyu</h1>
+        <p class="hint-text">Tap the button below to open your gift & start the music</p>
+        <button class="btn-primary" id="openGiftBtn">Open my gift ✨</button>
+      </div>
+    </section>
+
+    <!-- CHAPTER 02: THE MEMORY GARDEN -->
+    <section class="chapter" id="chapter-1">
+      <div class="chapter-tag">02 — The Memory Garden</div>
+      <h2 class="chapter-title">Blooms of Our Moments</h2>
+      <p class="chapter-desc">Ketuk setiap bunga di taman ini untuk membuka pesan rahasia di baliknya.</p>
+
+      <div class="garden-grid">
+        <button class="flower-card" data-msg="Terima kasih sudah selalu menjadi pribadi yang hangat dan menyenangkan untuk diajak bercerita tentang apa saja.">
+          <span class="flower-icon">🌷</span>
+          <span class="flower-label">Tulip Merah Muda</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Semoga di setiap langkah yang ka wahyu ambil, selalu ada hal-hal baik yang diam-diam berpihak.">
+          <span class="flower-icon">🌻</span>
+          <span class="flower-label">Bunga Matahari</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Kalau hari-hari terasa penuh dan melelahkan, semoga selalu ada ruang tenang untuk ka wahyu bernapas lega.">
+          <span class="flower-icon">🌸</span>
+          <span class="flower-label">Cherry Blossom</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+        <button class="flower-card" data-msg="Tetaplah jadi ka wahyu dengan segala versi terbaiknya, karena kehadiranmu selalu membawa warna tersendiri.">
+          <span class="flower-icon">🌹</span>
+          <span class="flower-label">Mawar Klasik</span>
+          <span class="flower-status">Ketuk untuk buka</span>
+        </button>
+      </div>
+
+      <div class="flower-message-box">
+        <p id="flowerMessageText">Pilih salah satu bunga di atas untuk membaca pesannya...</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Lanjut ke Scrapbook →</button>
+      </div>
+    </section>
+
+    <!-- CHAPTER 03: LITTLE MEMORIES (7 FOTO POLAROID) -->
+    <section class="chapter" id="chapter-2">
+      <div class="chapter-tag">03 — Little Memories</div>
+      <h2 class="chapter-title">Polaroids & Scrapbook</h2>
+      <p class="chapter-desc">Potongan kecil cerita yang sayang jika dilewatkan begitu saja.</p>
+
+      <div class="scrapbook-grid">
+        <!-- Foto 1 -->
+        <div class="polaroid" style="--rot: -2.5deg;">
+          <div class="tape"></div>
+          <img src="foto1.jpg" alt="Memory 1" />
+          <p class="caption">“Katanya manusia biasa. Tapi kok bisa punya banyak versi yang menarik untuk diamati?”</p>
+        </div>
+
+        <!-- Foto 2 -->
+        <div class="polaroid" style="--rot: 2deg;">
+          <div class="tape"></div>
+          <img src="foto2.jpg" alt="Memory 2" />
+          <p class="caption">“Tidak sedang melakukan sesuatu yang istimewa, hanya menjadi diri sendiri. Dan entah kenapa, itu sudah cukup.”</p>
+        </div>
+
+        <!-- Foto 3 -->
+        <div class="polaroid" style="--rot: -1.5deg;">
+          <div class="tape"></div>
+          <img src="foto3.jpg" alt="Memory 3" />
+          <p class="caption">“Di antara sekian banyak hal yang bisa diprediksi, manusia tetap menjadi salah satu misteri paling menarik.”</p>
+        </div>
+
+        <!-- Foto 4 -->
+        <div class="polaroid" style="--rot: 2.5deg;">
+          <div class="tape"></div>
+          <img src="foto4.jpg" alt="Memory 4" />
+          <p class="caption">“Semoga hal-hal kecil yang sering luput dari perhatianmu justru menjadi alasan paling sederhana untuk bahagia.”</p>
+        </div>
+
+        <!-- Foto 5 -->
+        <div class="polaroid" style="--rot: -2deg;">
+          <div class="tape"></div>
+          <img src="foto5.jpg" alt="Memory 5" />
+          <p class="caption">“Ada banyak cerita yang belum selesai, banyak tempat yang belum dituju, dan banyak hal baik yang masih menunggu.”</p>
+        </div>
+
+        <!-- Foto 6 -->
+        <div class="polaroid" style="--rot: 1.8deg;">
+          <div class="tape"></div>
+          <img src="foto6.jpg" alt="Memory 6" />
+          <p class="caption">“Jangan terlalu sibuk menjadi seseorang yang hebat sampai lupa menikmati menjadi seseorang yang bahagia.”</p>
+        </div>
+
+        <!-- Foto 7 -->
+        <div class="polaroid" style="--rot: -2.2deg;">
+          <div class="tape"></div>
+          <img src="foto7.jpg" alt="Memory 7" />
+          <p class="caption">“Anyway, pemeran utama hari ini resmi bertambah usia. Semoga semesta lebih sering berpihak, urusan dipermudah, dan kebahagiaan nggak cuma datang sebagai tamu, tapi menetap.”</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Buka Surat →</button>
+      </div>
+    </section>
+
+    <!-- CHAPTER 04: A LETTER FOR YOU -->
+    <section class="chapter" id="chapter-3">
+      <div class="chapter-tag">04 — A Letter for You</div>
+      <h2 class="chapter-title">Words Left Unsaid</h2>
+
+      <div>
+        <button class="btn-envelope" id="unfoldLetterBtn">✉️ Buka Amplop Surat</button>
+
+        <article class="letter-paper" id="letterPaper">
+          <p>
+            Di perputaran semesta yang ke-365, kamu berhasil untuk melalui banyak badainya.
+            Selamat ya, menjadi salah satu manusia pilihan Tuhan untuk tetap singgah di bumi sampai usiamu sekarang.
+          </p>
+          <p>
+            Selamat ulang tahun Ka Wahyu.
+          </p>
+          <p class="letter-sign">Dengan hangat,<br><strong>Neha</strong></p>
+        </article>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn-secondary prev-btn">← Kembali</button>
+        <button class="btn-primary next-btn">Lihat Kejutan Terakhir →</button>
+      </div>
+    </section>
+
+    <!-- CHAPTER 05: YOUR BIRTHDAY WISH -->
+    <section class="chapter" id="chapter-4">
+      <div class="chapter-tag">05 — Your Birthday Wish</div>
+      <h2 class="chapter-title">Make a Wish!</h2>
+      <p class="chapter-desc">Pejamkan mata sejenak, ucapkan harapan terbaikmu, lalu tiup lilinnya.</p>
+
+      <div class="cake-stage">
+        <div class="cake">
+          <div class="candle">
+            <div class="flame" id="flame"></div>
+          </div>
+          <div class="frosting"></div>
+          <div class="cake-body"></div>
+          <div class="plate"></div>
+        </div>
+        <button class="btn-primary" id="blowCandleBtn">🌬️ Tiup Lilin & Rayakan</button>
+      </div>
+
+      <div class="final-gift-card" id="finalGiftCard">
+        <h3>🎁 Hadiah Terakhir Untukmu</h3>
+        <p>
+          Selamat ulang tahun sekali lagi! Semoga taman kenangan kecil ini bisa bikin kamu tersenyum hari ini.
+        </p>
+        <button class="btn-secondary" id="restartBtn">↺ Ulangi dari Awal</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const chapters = document.querySelectorAll(".chapter");
+      const dots = document.querySelectorAll(".dot");
+      let currentChapter = 0;
+
+      const bgMusic = document.getElementById("bgMusic");
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const musicPlayer = document.getElementById("musicPlayer");
+      const togglePlayerSize = document.getElementById("togglePlayerSize");
+
+      bgMusic.volume = volumeSlider.value;
+
+      function goToChapter(index) {
+        if (index < 0 || index >= chapters.length) return;
+        chapters[currentChapter].classList.remove("active");
+        dots[currentChapter].classList.remove("active");
+
+        currentChapter = index;
+        chapters[currentChapter].classList.add("active");
+        dots[currentChapter].classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function playMusic() {
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            playPauseBtn.textContent = "⏸";
+            musicPlayer.classList.add("playing");
+          }).catch((error) => {
+            console.error("Gagal memutar audio:", error);
+            alert("Lagu belum bisa diputar. Pastikan file 'audio.mp3' sudah di-upload ke GitHub sejajar dengan index.html dan namanya huruf kecil semua.");
+          });
+        }
+      }
+
+      function pauseMusic() {
+        bgMusic.pause();
+        playPauseBtn.textContent = "▶";
+        musicPlayer.classList.remove("playing");
+      }
+
+      playPauseBtn.addEventListener("click", () => {
+        if (bgMusic.paused) {
+          playMusic();
+        } else {
+          pauseMusic();
+        }
+      });
+
+      volumeSlider.addEventListener("input", (e) => {
+        bgMusic.volume = e.target.value;
+      });
+
+      togglePlayerSize.addEventListener("click", () => {
+        musicPlayer.classList.toggle("minimized");
+        togglePlayerSize.textContent = musicPlayer.classList.contains("minimized") ? "+" : "−";
+      });
+
+      document.getElementById("openGiftBtn").addEventListener("click", () => {
+        playMusic();
+        goToChapter(1);
+      });
+
+      document.querySelectorAll(".next-btn").forEach((btn) => {
+        btn.addEventListener("click", () => goToChapter(currentChapter + 1));
+      });
+
+      document.querySelectorAll(".prev-btn").forEach((btn) => {
+        btn.addEventListener("click", () => goToChapter(currentChapter - 1));
+      });
+
+      const flowerCards = document.querySelectorAll(".flower-card");
+      const flowerMessageText = document.getElementById("flowerMessageText");
+
+      flowerCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          flowerCards.forEach((c) => c.classList.remove("opened"));
+          card.classList.add("opened");
+          card.querySelector(".flower-status").textContent = "Terbuka ✨";
+          flowerMessageText.textContent = `"${card.dataset.msg}"`;
+        });
+      });
+
+      const unfoldLetterBtn = document.getElementById("unfoldLetterBtn");
+      const letterPaper = document.getElementById("letterPaper");
+
+      unfoldLetterBtn.addEventListener("click", () => {
+        letterPaper.classList.add("open");
+        unfoldLetterBtn.style.display = "none";
+      });
+
+      const blowCandleBtn = document.getElementById("blowCandleBtn");
+      const flame = document.getElementById("flame");
+      const finalGiftCard = document.getElementById("finalGiftCard");
+
+      blowCandleBtn.addEventListener("click", () => {
+        flame.classList.add("out");
+        blowCandleBtn.textContent = "🎉 Happy Birthday!";
+        blowCandleBtn.disabled = true;
+        finalGiftCard.classList.add("show");
+        launchConfetti();
+      });
+
+      document.getElementById("restartBtn").addEventListener("click", () => {
+        flame.classList.remove("out");
+        blowCandleBtn.textContent = "🌬️ Tiup Lilin & Rayakan";
+        blowCandleBtn.disabled = false;
+        finalGiftCard.classList.remove("show");
+        letterPaper.classList.remove("open");
+        unfoldLetterBtn.style.display = "inline-block";
+        goToChapter(0);
+      });
+
+      function launchConfetti() {
+        const canvas = document.getElementById("fx-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ["#b85d6f", "#c59b5f", "#6c8270", "#f2b5d4", "#f7d6e0"];
+        const pieces = Array.from({ length: 90 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 3 + 2,
+          speedX: (Math.random() - 0.5) * 2,
+          angle: Math.random() * 360
+        }));
+
+        let frame = 0;
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          pieces.forEach((p) => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.angle += 4;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.angle * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            ctx.restore();
+          });
+          frame++;
+          if (frame < 220) {
+            requestAnimationFrame(animate);
+          } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+        animate();
+      }
+    });
+  </script>
+</body>
+</html>
