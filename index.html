@@ -393,16 +393,18 @@
       place-items: center;
     }
 
-    /* CHAPTER 03: SCRAPBOOK POLAROIDS */
+    /* CHAPTER 03: SCRAPBOOK POLAROIDS (5 FOTO) */
     .scrapbook-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 22px;
       margin-top: 10px;
     }
 
     .polaroid {
       background: #fff;
+      width: 210px;
       padding: 12px 12px 20px;
       border: 1px solid #eadfd2;
       box-shadow: 0 10px 24px rgba(0,0,0,0.07);
@@ -580,6 +582,7 @@
     @media (max-width: 600px) {
       .chapter { padding: 32px 18px; }
       .recipient-name { font-size: 1.9rem; }
+      .polaroid { width: 100%; max-width: 280px; }
       .music-player { width: calc(100% - 32px); right: 16px; bottom: 14px; }
     }
   </style>
@@ -598,8 +601,8 @@
       <button id="togglePlayerSize" class="minimize-btn" title="Perkecil/Perbesar">−</button>
     </div>
     <div class="music-body">
-      <!-- Ganti src dengan nama file cover lagu kamu (misal: cover.jpg) -->
-      <img src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=150&q=80" alt="Album Cover" class="album-cover" />
+      <!-- Upload cover lagu ke GitHub dengan nama cover.jpg (atau sesuaikan nama filenya) -->
+      <img src="cover.jpg" alt="Album Cover" class="album-cover" />
       <div class="music-info">
         <div class="song-title">Until I Found You</div>
         <div class="song-artist">Stephen Sanchez</div>
@@ -683,7 +686,7 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- CHAPTER 03: LITTLE MEMORIES (EDIT FOTO & CAPTION POLAROID)-->
+    <!-- CHAPTER 03: LITTLE MEMORIES (5 FOTO POLAROID)             -->
     <!-- ========================================================= -->
     <section class="chapter" id="chapter-2">
       <div class="chapter-tag">03 — Little Memories</div>
@@ -691,23 +694,39 @@
       <p class="chapter-desc">Potongan kecil cerita yang sayang jika dilewatkan begitu saja.</p>
 
       <div class="scrapbook-grid">
+        <!-- Foto 1 -->
         <div class="polaroid" style="--rot: -3deg;">
           <div class="tape"></div>
-          <!-- Ganti src dengan nama file foto kamu (misal: foto1.jpg) -->
-          <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=500&q=80" alt="Memory 1" />
-          <p class="caption">Awal cerita yang sederhana, tapi selalu membekas.</p>
+          <img src="foto1.jpg" alt="Memory 1" />
+          <p class="caption">Caption kenangan pertama di sini.</p>
         </div>
+
+        <!-- Foto 2 -->
         <div class="polaroid" style="--rot: 2.5deg;">
           <div class="tape"></div>
-          <!-- Ganti src dengan nama file foto kamu (misal: foto2.jpg) -->
-          <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=500&q=80" alt="Memory 2" />
-          <p class="caption">Waktu terasa berjalan lebih cepat setiap kali bercerita.</p>
+          <img src="foto2.jpg" alt="Memory 2" />
+          <p class="caption">Caption kenangan kedua di sini.</p>
         </div>
+
+        <!-- Foto 3 -->
         <div class="polaroid" style="--rot: -2deg;">
           <div class="tape"></div>
-          <!-- Ganti src dengan nama file foto kamu (misal: foto3.jpg) -->
-          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80" alt="Memory 3" />
-          <p class="caption">Semoga lebih banyak lagi momen indah yang bisa dirayakan.</p>
+          <img src="foto3.jpg" alt="Memory 3" />
+          <p class="caption">Caption kenangan ketiga di sini.</p>
+        </div>
+
+        <!-- Foto 4 -->
+        <div class="polaroid" style="--rot: 3deg;">
+          <div class="tape"></div>
+          <img src="foto4.jpg" alt="Memory 4" />
+          <p class="caption">Caption kenangan keempat di sini.</p>
+        </div>
+
+        <!-- Foto 5 -->
+        <div class="polaroid" style="--rot: -2.5deg;">
+          <div class="tape"></div>
+          <img src="foto5.jpg" alt="Memory 5" />
+          <p class="caption">Caption kenangan kelima di sini.</p>
         </div>
       </div>
 
